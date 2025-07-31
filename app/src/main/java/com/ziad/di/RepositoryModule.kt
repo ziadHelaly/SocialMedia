@@ -1,0 +1,18 @@
+package com.ziad.di
+
+import com.ziad.data.repository.PostsRepository
+import com.ziad.data.repository.PostsRepositoryImpl
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RepositoryModule {
+    @Singleton
+    @Binds
+    abstract fun bindPostsRepository(impl: PostsRepositoryImpl): PostsRepository
+
+}
