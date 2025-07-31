@@ -1,4 +1,4 @@
-package com.ziad.ui.theme
+package com.ziad.view.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
