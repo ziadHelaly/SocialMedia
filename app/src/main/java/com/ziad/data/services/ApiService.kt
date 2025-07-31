@@ -1,5 +1,6 @@
 package com.ziad.data.services
 
+import com.ziad.data.model.DeleteResponse
 import com.ziad.data.model.Post
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -34,5 +35,5 @@ interface ApiService {
     ): Response<Post>
 
     @POST("delete/{id}")
-    suspend fun deletePost(@Path("id") id: Int)
+    suspend fun deletePost(@Path("id") id: Int): Response<DeleteResponse>
 }
