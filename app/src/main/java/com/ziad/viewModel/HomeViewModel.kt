@@ -28,17 +28,25 @@ class HomeViewModel @Inject constructor(
     val isLoading = _isLoading.asStateFlow()
     private val _message = MutableSharedFlow<String?>()
     val message = _message.asSharedFlow()
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
 
     fun getAllPosts() {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
             try {
                 _posts.value = repository.getAllPosts()
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 _message.emit("Failed to fetch posts: ${e.message ?: "unknown error"}")
             }
             _isLoading.value = false
         }
+    }
+
+    fun refresh() {
+        _isRefreshing.value = true
+        getAllPosts()
+        _isRefreshing.value = false
     }
 
     fun createPost(
@@ -50,7 +58,7 @@ class HomeViewModel @Inject constructor(
             _isLoading.value = true
             try {
                 val photoFile = photoUri?.let { imageFileProvider.uriToFile(it) }
-                if (photoFile != null){
+                if (photoFile != null) {
                     val res = repository.storePost(
                         photo = photoFile,
                         title = title,

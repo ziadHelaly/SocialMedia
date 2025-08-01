@@ -14,11 +14,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,6 +48,7 @@ fun HomeScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     var showNewPostDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.getAllPosts()
@@ -90,45 +91,51 @@ fun HomeScreen(
                 CircularProgressIndicator()
             }
         } else {
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = { viewModel.refresh() },
+                modifier = modifier.padding(innerPadding)
             ) {
-                if (posts.isNotEmpty()) {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ) {
-                        items(posts) {
-                            PostRow(it, onNavToDetails)
-                        }
-                    }
-                } else {
-                    EmptyState(
-                        imgRes = R.drawable.ic_empty_posts,
-                        mainText = "No Post Available",
-                        description = "Add Some Posts from add button",
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
-
-                if (showNewPostDialog) {
-                    PostDialog(
-                        onDismiss = { showNewPostDialog = false },
-                        onSubmit = { title, content, imageUri ->
-                            if (imageUri != null) {
-                                viewModel.createPost(title, content, imageUri)
-
-                            } else {
-                                Log.d("``TAG``", "HomeScreen: should add a img")
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                ) {
+                    if (posts.isNotEmpty()) {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            items(posts) {
+                                PostRow(it, onNavToDetails)
                             }
-                            showNewPostDialog = false
                         }
-                    )
+                    } else {
+                        EmptyState(
+                            imgRes = R.drawable.ic_empty_posts,
+                            mainText = "No Post Available",
+                            description = "Add Some Posts from add button",
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+
+
+                    if (showNewPostDialog) {
+                        PostDialog(
+                            onDismiss = { showNewPostDialog = false },
+                            onSubmit = { title, content, imageUri ->
+                                if (imageUri != null) {
+                                    viewModel.createPost(title, content, imageUri)
+
+                                } else {
+                                    Log.d("``TAG``", "HomeScreen: should add a img")
+                                }
+                                showNewPostDialog = false
+                            }
+                        )
+                    }
                 }
+
             }
         }
     }
