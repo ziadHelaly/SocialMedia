@@ -17,7 +17,7 @@ object AppModule {
     @Provides
     fun provideRetrofit(): Retrofit{
         return Retrofit.Builder()
-            .baseUrl("http://taskapi.astra-tech.net/api/blogs")
+            .baseUrl("https://taskapi.astra-tech.net/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
