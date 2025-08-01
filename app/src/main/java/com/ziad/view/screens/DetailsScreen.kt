@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.ziad.R
 import com.ziad.view.screens.components.PostDialog
 import com.ziad.view.screens.components.rememberRelativeTime
 import com.ziad.viewModel.DetailsViewModel
@@ -151,9 +152,12 @@ fun DetailsScreen(
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(MaterialTheme.colorScheme.background),
                                 contentScale = ContentScale.Fit,
-//                                placeholder = painterResource(id = R.drawable.placeholder), // replace with your placeholder
-//                                error = painterResource(id = R.drawable.ic_broken_image) // replace with your error drawable
-                            )
+                            ) { requestBuilder ->
+                                requestBuilder
+                                    .placeholder(R.drawable.ic_placeholder)
+                                    .error(R.drawable.ic_error)
+                                    .fallback(R.drawable.ic_error)
+                            }
 
                             Spacer(Modifier.height(16.dp))
 
