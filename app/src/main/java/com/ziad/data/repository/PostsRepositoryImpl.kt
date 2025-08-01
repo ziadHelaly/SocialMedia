@@ -43,14 +43,16 @@ class PostsRepositoryImpl @Inject constructor(private val service: ApiService) :
 
     override suspend fun updatePost(
         id: Int,
-        photo: File,
+        photo: File?,
         title: String,
         content: String
     ): Result {
         return try {
             val titleBody = createPartFromString(title)
             val contentBody = createPartFromString(content)
-            val photoPart = prepareFilePart("photo", photo)
+            val photoPart = photo?.let {
+                prepareFilePart("photo", it)
+            }
 
             val response = service.updatePost(id, photoPart, titleBody, contentBody)
             if (response.isSuccessful) {

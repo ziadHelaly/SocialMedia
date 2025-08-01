@@ -14,7 +14,7 @@ interface PostsRepository {
     ): Result
     suspend fun updatePost(
         id: Int,
-        photo: File,
+        photo: File?,
         title: String,
         content: String
     ): Result
