@@ -14,6 +14,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -45,36 +47,49 @@ fun HomeScreen(
     val posts by viewModel.posts.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     var showNewPostDialog by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.getAllPosts()
     }
-    if (isLoading) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            CircularProgressIndicator()
+    LaunchedEffect(viewModel.message) {
+        viewModel.message.collect { message ->
+            if (message != null) {
+                snackbarHostState.showSnackbar(message)
+            }
         }
-    } else {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = "Home",
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                )
-            },
-            floatingActionButton = {
+    }
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Home",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            )
+        },
+        floatingActionButton = {
+            if (!isLoading) {
                 FloatingActionButton(onClick = { showNewPostDialog = true }) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = "Add Post")
                 }
             }
-        ) { innerPadding ->
+        }
+    ) { innerPadding ->
+        if (isLoading) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
             Box(
                 modifier = modifier
                     .fillMaxSize()
@@ -103,7 +118,7 @@ fun HomeScreen(
                 if (showNewPostDialog) {
                     PostDialog(
                         onDismiss = { showNewPostDialog = false },
-                        onSubmit = { title, content, imageUri->
+                        onSubmit = { title, content, imageUri ->
                             if (imageUri != null) {
                                 viewModel.createPost(title, content, imageUri)
 

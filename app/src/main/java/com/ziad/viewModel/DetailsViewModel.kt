@@ -46,7 +46,9 @@ class DetailsViewModel @Inject constructor(
 
     fun deletePost() {
         viewModelScope.launch {
+            _isLoading.value = true
             _message.emit(repo.deletePost(_post.value?.id ?: 1) ?: "")
+            _isLoading.value = false
             _isDeleted.emit(true)
         }
     }

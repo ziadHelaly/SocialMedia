@@ -26,8 +26,8 @@ class HomeViewModel @Inject constructor(
     val posts = _posts.asStateFlow()
     private val _isLoading = MutableStateFlow(true)
     val isLoading = _isLoading.asStateFlow()
-    private val _errorMessage = MutableSharedFlow<String?>()
-    val errorMessage = _errorMessage.asSharedFlow()
+    private val _message = MutableSharedFlow<String?>()
+    val message = _message.asSharedFlow()
 
     fun getAllPosts() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -35,7 +35,7 @@ class HomeViewModel @Inject constructor(
             try {
                 _posts.value = repository.getAllPosts()
             }catch (e: Exception){
-                Log.d("``TAG``", "getAllPosts:${e.message} ")
+                _message.emit("Failed to fetch posts: ${e.message ?: "unknown error"}")
             }
             _isLoading.value = false
         }
@@ -57,18 +57,16 @@ class HomeViewModel @Inject constructor(
                         content = content
                     )
                     if (res is Result.Error) {
-//                        _message.emit(res.message)
+                        _message.emit(res.message)
                     } else {
-                        Log.d("``TAG``", "createPost: post created")
-//                        _message.emit("Post created successfully")
-                        // optionally refresh list
+                        _message.emit("Post created successfully")
                         getAllPosts()
                     }
 
                 }
 
             } catch (e: Exception) {
-//                _message.emit("Failed to create post: ${e.message ?: "unknown error"}")
+                _message.emit("Failed to create post: ${e.message ?: "unknown error"}")
             } finally {
                 _isLoading.value = false
             }
