@@ -206,7 +206,7 @@ fun DetailsScreen(
                     isUpdate = true,
                     updatePost = post,
                     onDismiss = { showEditDialog = false },
-                    onSubmit = { title, content, imageUri, isPhotoChanged ->
+                    onSubmit = { title, content, imageUri ->
                         viewModel.updatePost(title, content, imageUri)
                         showEditDialog = false
                     }

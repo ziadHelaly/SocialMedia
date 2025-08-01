@@ -5,7 +5,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.ziad.data.model.Post
@@ -23,7 +26,7 @@ fun PostDialog(
     isUpdate: Boolean=false,
     updatePost: Post?=null,
     onDismiss: () -> Unit,
-    onSubmit: (title: String, content: String, imageUri: Uri?, isPhotoChanged:Boolean) -> Unit
+    onSubmit: (title: String, content: String, imageUri: Uri?) -> Unit
 ) {
     var title by remember { mutableStateOf(updatePost?.title ?: "") }
     var content by remember { mutableStateOf(updatePost?.content ?: "") }
@@ -41,10 +44,17 @@ fun PostDialog(
     }
 
     AlertDialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = onDismiss,
         title = { Text( if (isUpdate) "Update Post" else "New Post") },
         text = {
-            Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .imePadding()
+                    .padding(horizontal = 0.dp)
+            ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -114,7 +124,7 @@ fun PostDialog(
                 if (title.isBlank() || content.isBlank()) {
                     showValidationError = true
                 } else {
-                    onSubmit(title.trim(), content.trim(), imageUri, isPhotoChanged)
+                    onSubmit(title.trim(), content.trim(), imageUri)
                 }
             }) {
                 Text(if (isUpdate) "Update" else "Create")

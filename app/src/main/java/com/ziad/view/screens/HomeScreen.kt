@@ -103,7 +103,7 @@ fun HomeScreen(
                 if (showNewPostDialog) {
                     PostDialog(
                         onDismiss = { showNewPostDialog = false },
-                        onSubmit = { title, content, imageUri, _ ->
+                        onSubmit = { title, content, imageUri->
                             if (imageUri != null) {
                                 viewModel.createPost(title, content, imageUri)
 
