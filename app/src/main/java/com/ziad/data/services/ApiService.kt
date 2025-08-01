@@ -12,28 +12,28 @@ import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface ApiService {
-    @GET
+    @GET("api/blogs/")
     suspend fun getPosts(): List<Post>
 
-    @GET("show/{id}")
+    @GET("api/blogs/show/{id}")
     suspend fun getPostById(@Path("id") id: Int): Post
 
     @Multipart
-    @POST("store")
+    @POST("api/blogs/store")
     suspend fun uploadPost(
         @Part photo: MultipartBody.Part,
         @Part("title") title: RequestBody,
         @Part("content") content: RequestBody
     ): Response<Post>
 
-    @POST("update/{id}")
+    @POST("api/blogs/update/{id}")
     suspend fun updatePost(
         @Path("id") id: Int,
-        @Part photo: MultipartBody.Part,
+        @Part photo: MultipartBody.Part?,
         @Part("title") title: RequestBody,
         @Part("content") content: RequestBody
     ): Response<Post>
 
-    @POST("delete/{id}")
+    @POST("api/blogs/delete/{id}")
     suspend fun deletePost(@Path("id") id: Int): Response<DeleteResponse>
 }
