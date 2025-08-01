@@ -15,16 +15,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.ziad.data.model.Post
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun CreatePostDialog(
+fun PostDialog(
+    isUpdate: Boolean=false,
+    updatePost: Post?=null,
     onDismiss: () -> Unit,
-    onSubmit: (title: String, content: String, imageUri: Uri?) -> Unit
+    onSubmit: (title: String, content: String, imageUri: Uri?, isPhotoChanged:Boolean) -> Unit
 ) {
-    var title by remember { mutableStateOf("") }
-    var content by remember { mutableStateOf("") }
+    var title by remember { mutableStateOf(updatePost?.title ?: "") }
+    var content by remember { mutableStateOf(updatePost?.content ?: "") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var isPhotoChanged by remember { mutableStateOf(false) }
     var showValidationError by remember { mutableStateOf(false) }
 
     val pickImageLauncher = rememberLauncherForActivityResult(
@@ -32,12 +36,13 @@ fun CreatePostDialog(
     ) { uri: Uri? ->
         if (uri != null) {
             imageUri = uri
+            isPhotoChanged = true
         }
     }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("New Post") },
+        title = { Text( if (isUpdate) "Update Post" else "New Post") },
         text = {
             Column {
                 Box(
@@ -48,16 +53,15 @@ fun CreatePostDialog(
                         .background(MaterialTheme.colorScheme.outline),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (imageUri != null) {
+                    if (imageUri != null || isUpdate) {
                         GlideImage(
-                            model = imageUri,
+                            model = if(isUpdate && !isPhotoChanged) updatePost!!.photo else imageUri ,
                             contentDescription = "Selected image",
                             modifier = Modifier
                                 .fillMaxSize()
                                 .clip(RoundedCornerShape(8.dp)),
-                            contentScale = ContentScale.Crop
+                            contentScale = ContentScale.Fit
                         )
-                        // Optionally: small "change" overlay
                         TextButton(
                             onClick = { pickImageLauncher.launch("image/*") },
                             modifier = Modifier
@@ -110,10 +114,10 @@ fun CreatePostDialog(
                 if (title.isBlank() || content.isBlank()) {
                     showValidationError = true
                 } else {
-                    onSubmit(title.trim(), content.trim(), imageUri)
+                    onSubmit(title.trim(), content.trim(), imageUri, isPhotoChanged)
                 }
             }) {
-                Text("Create")
+                Text(if (isUpdate) "Update" else "Create")
             }
         },
         dismissButton = {
