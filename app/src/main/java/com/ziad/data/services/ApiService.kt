@@ -26,6 +26,7 @@ interface ApiService {
         @Part("content") content: RequestBody
     ): Response<Post>
 
+    @Multipart
     @POST("api/blogs/update/{id}")
     suspend fun updatePost(
         @Path("id") id: Int,

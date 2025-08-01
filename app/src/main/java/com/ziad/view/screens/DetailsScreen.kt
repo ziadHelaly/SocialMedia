@@ -1,5 +1,6 @@
 package com.ziad.view.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.ziad.view.screens.components.PostDialog
 import com.ziad.view.screens.components.rememberRelativeTime
 import com.ziad.viewModel.DetailsViewModel
 
@@ -60,6 +62,8 @@ fun DetailsScreen(
 
     var showDeleteConfirm by remember { mutableStateOf(false) }
     var showDeleteConfirmed by remember { mutableStateOf(false) }
+
+    var showEditDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.isDeleted.collect {
@@ -89,7 +93,7 @@ fun DetailsScreen(
                 },
                 actions = {
                     if (post != null) {
-                        IconButton(onClick = { }) {
+                        IconButton(onClick = { showEditDialog = true }) {
                             Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit post")
                         }
                         IconButton(onClick = { showDeleteConfirm = true }) {
@@ -194,6 +198,17 @@ fun DetailsScreen(
                         }) {
                             Text("Done")
                         }
+                    }
+                )
+            }
+            if (showEditDialog && post != null) {
+                PostDialog(
+                    isUpdate = true,
+                    updatePost = post,
+                    onDismiss = { showEditDialog = false },
+                    onSubmit = { title, content, imageUri, isPhotoChanged ->
+                        viewModel.updatePost(title, content, imageUri)
+                        showEditDialog = false
                     }
                 )
             }

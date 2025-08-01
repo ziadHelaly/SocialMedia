@@ -1,9 +1,12 @@
 package com.ziad.viewModel
 
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ziad.data.model.Post
 import com.ziad.data.repository.PostsRepository
+import com.ziad.utils.ImageFileProvider
 import com.ziad.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,7 +19,11 @@ import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
-class DetailsViewModel @Inject constructor(private val repo: PostsRepository) : ViewModel() {
+class DetailsViewModel @Inject constructor(
+    private val repo: PostsRepository,
+    private val imageFileProvider: ImageFileProvider
+
+) : ViewModel() {
     private val _post = MutableStateFlow<Post?>(null)
     val post = _post.asStateFlow()
 
@@ -47,21 +54,30 @@ class DetailsViewModel @Inject constructor(private val repo: PostsRepository) : 
     fun updatePost(
         title: String,
         content: String,
-        photo:File?
+        photoUri: Uri?
     ) {
         viewModelScope.launch {
-            _isLoading.value = true
-            val res = repo.updatePost(
-                id = _post.value?.id ?: 1,
-                photo = photo,
-                title = title,
-                content = content
-            )
-            _isLoading.value = false
-            if (res is Result.Error) {
-                _message.emit(res.message)
-            } else {
-                _message.emit("Post updated successfully")
+            try {
+                val photoFile = photoUri?.let { imageFileProvider.uriToFile(it) }
+
+                val res = repo.updatePost(
+                    id = _post.value?.id ?: 1,
+                    photo = photoFile,
+                    title = title,
+                    content = content
+                )
+                if (res is Result.Error) {
+                    Log.d("```TAG```", "updatePost: ${res.message}")
+                    _message.emit(res.message)
+                } else {
+                    Log.d("``TAG``", "createPost: post updated")
+                    _message.emit("Post Updated successfully")
+                    getPostById(id = _post.value?.id ?: 1)
+                }
+
+            } catch (e: Exception) {
+                Log.d("``TAG``", "Failed to create post: ${e.message ?: "unknown error"}")
+                _message.emit("Failed to create post: ${e.message ?: "unknown error"}")
             }
         }
     }
