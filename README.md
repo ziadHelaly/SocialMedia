@@ -24,6 +24,25 @@ The app follows clean **MVVM architecture**, uses **Hilt** for dependency inject
 
 ---
 
+### Design Pattern
+MVVM (Model–View–ViewModel)
+
+Ensures a clean separation between UI, business logic, and data layers.
+
+Makes the app easier to test and maintain.
+
+---
+### External Packages Used
+<li> Retrofit → To handle API requests in a clean and maintainable way.</li>
+
+<li> Hilt → To implement dependency injection for easier testing and scalability.</li>
+
+<li> Glide → For efficient image loading and caching.</li>
+
+<li> Jetpack Compose Navigation → To manage navigation between app screens.</li>
+
+---
+
 ## Tech Stack
 
 - **Language:** Kotlin  
