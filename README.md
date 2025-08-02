@@ -82,7 +82,7 @@ Makes the app easier to test and maintain.
 
 1-Clone the repository:
 ```bash
-git clone https://github.com/<your-username>/SocialMedia.git
+git clone https://github.com/ziadHelaly/SocialMedia.git
 cd SocialMedia
 ```
 2-Open in Android Studio.
